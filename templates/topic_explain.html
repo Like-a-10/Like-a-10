@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic Explanation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('home') }}" class="back-btn">← Back to Home</a>
+        
+        <h1>Topic Explanation</h1>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="topic">Enter Topic:</label>
+                <input type="text" id="topic" name="topic" required 
+                       placeholder="e.g., Newton's First Law, Photosynthesis"
+                       value="{{ topic if topic else '' }}">
+            </div>
+
+            <div class="form-group">
+                <label>Select Explanation Level:</label>
+                <div class="level-selector">
+                    <label class="level-option">
+                        <input type="radio" name="level" value="child" {% if level == 'child' %}checked{% endif %} required>
+                        Child (Age 10)
+                    </label>
+                    <label class="level-option">
+                        <input type="radio" name="level" value="teen" {% if level == 'teen' %}checked{% endif %}>
+                        Teen (High School)
+                    </label>
+                    <label class="level-option">
+                        <input type="radio" name="level" value="expert" {% if level == 'expert' %}checked{% endif %}>
+                        Expert (College)
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn">Get Explanation</button>
+        </form>
+
+        {% if explanation %}
+<div class="result">
+    <h2>
+        {% if level == 'child' %}
+            <span class="level-badge child">Kid-Friendly Explanation 🌟</span>
+        {% elif level == 'teen' %}
+            <span class="level-badge teen">High School Level 📚</span>
+        {% else %}
+            <span class="level-badge expert">Expert Analysis 🎓</span>
+        {% endif %}
+    </h2>
+    
+    <div class="explanation-box {{ level }}-explanation">
+        {{ explanation | safe }}
+    </div>
+</div>
+{% endif %}

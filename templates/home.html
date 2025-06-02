@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educational Explainer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Educational Explainer</h1>
+        
+        <div class="choice-cards">
+            <div class="card" onclick="window.location.href='{{ url_for('topic_explain') }}'">
+                <h2>Explain a Topic</h2>
+                <p>Get explanations for educational topics like Newton's Laws, Photosynthesis, etc.</p>
+                <button class="btn">Choose This</button>
+            </div>
+
+            <div class="card" onclick="window.location.href='{{ url_for('text_explain') }}'">
+                <h2>Explain Custom Text</h2>
+                <p>Enter your own text to get explanations at different levels.</p>
+                <button class="btn">Choose This</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
