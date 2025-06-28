@@ -1,9 +1,0 @@
-{
-    "Newton's First Law": "An object at rest stays at rest, and an object in motion stays in motion, unless acted upon by an external force. This law is also known as the law of inertia.",
-    "Newton's Second Law": "The acceleration of an object depends on the force acting upon it and the object's mass. This is expressed mathematically as F = ma.",
-    "Newton's Third Law": "For every action, there is an equal and opposite reaction. When one body exerts a force on a second body, the second body simultaneously exerts a force equal in magnitude and opposite in direction on the first body.",
-    "Joule's Law": "The heat produced by an electric current flowing through a resistance is directly proportional to the square of the current, the resistance, and the time for which the current flows.",
-    "Ohm's Law": "The current flowing through a conductor is directly proportional to the potential difference across it, provided the temperature remains constant.",
-    "Boyle's Law": "The pressure of a given mass of gas varies inversely with its volume at constant temperature.",
-    "Charles's Law": "The volume of a given mass of gas varies directly with its absolute temperature at constant pressure."
-}
