@@ -6,16 +6,21 @@ from dotenv import load_dotenv
 import os
 import pyttsx3
 import re
+from pydub import AudioSegment
+import pygame
 import threading
+import uuid
 
 # Load environment variables
 load_dotenv()
-langchain_key = os.getenv("LANGCHAIN_API_KEY")
-if langchain_key:
-    os.environ["LANGCHAIN_API_KEY"] = langchain_key
+if os.getenv("LANGCHAIN_API_KEY"):
+    os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
     os.environ["LANGCHAIN_TRACING_V2"] = "true"
 
-# Clean markdown formatting
+# Initialize pygame mixer
+pygame.mixer.init()
+
+# Cleanup markdown for smoother speech
 def clean_markdown(text):
     text = re.sub(r"^\s*[\*\-•]\s*", "", text, flags=re.MULTILINE)
     text = re.sub(r"^\s*\d+\.\s*", "", text, flags=re.MULTILINE)
@@ -26,37 +31,49 @@ def clean_markdown(text):
     text = re.sub(r"\[(.*?)\]\(.*?\)", r"\1", text)
     return text
 
-# TTS using pyttsx3 (non-interruptible)
-def speak_text_async(text, rate=150, voice_gender="Default"):
-    def run_tts():
-        cleaned = clean_markdown(text)
-        engine = pyttsx3.init()
-        engine.setProperty('rate', rate)
-        engine.setProperty('volume', 1.0)
+# Generate TTS and save as audio file
+def generate_tts(text, rate=150, voice_gender="Default"):
+    global AUDIO_FILE
+    AUDIO_FILE = f"tts_{uuid.uuid4().hex}.wav"  # unique name
 
-        voices = engine.getProperty('voices')
-        if voice_gender == "Male":
-            for voice in voices:
-                if "male" in voice.name.lower() or "male" in voice.id.lower():
-                    engine.setProperty('voice', voice.id)
-                    break
-        elif voice_gender == "Female":
-            for voice in voices:
-                if "female" in voice.name.lower() or "female" in voice.id.lower():
-                    engine.setProperty('voice', voice.id)
-                    break
+    engine = pyttsx3.init()
+    engine.setProperty('rate', rate)
+    engine.setProperty('volume', 1.0)
 
-        engine.say(cleaned)
-        engine.runAndWait()
+    voices = engine.getProperty('voices')
+    if voice_gender == "Male":
+        for voice in voices:
+            if "male" in voice.name.lower():
+                engine.setProperty('voice', voice.id)
+                break
+    elif voice_gender == "Female":
+        for voice in voices:
+            if "female" in voice.name.lower():
+                engine.setProperty('voice', voice.id)
+                break
 
-    threading.Thread(target=run_tts).start()
+    cleaned = clean_markdown(text)
+    engine.save_to_file(cleaned, "raw_tts.wav")
+    engine.runAndWait()
 
-# LangChain pipeline
+    sound = AudioSegment.from_file("raw_tts.wav", format="wav")
+    sound.export(AUDIO_FILE, format="wav")
+
+# Play the audio file
+def play_audio():
+    pygame.mixer.music.load(AUDIO_FILE)
+    pygame.mixer.music.play()
+
+# Stop playback
+def stop_audio():
+    if pygame.mixer.music.get_busy():
+        pygame.mixer.music.stop()
+
+# Langchain setup
 prompt = ChatPromptTemplate.from_messages([
     ("system", "You are a helpful assistant. Please provide a helpful response to the user queries."),
     ("user", "Question: {question}")
 ])
-
 llm = OllamaLLM(model="gemma3", model_kwargs={"num_predict": 150}, temperature=0.8)
 output_parser = StrOutputParser()
 chain = prompt | llm | output_parser
@@ -66,40 +83,37 @@ st.set_page_config(page_title="Like-a-10", page_icon="🧠")
 st.title("Like-a-10: Smart Explainer Bot")
 
 input_text = st.text_input("Enter your question:")
-
 mode = st.radio("Choose Explanation Style:", [
-    "Default",
-    "Child-Friendly",
-    "Examples Only",
-    "Expert"
+    "Default", "Child-Friendly", "Examples Only", "Expert"
 ])
-
-# TTS controls
-st.markdown("### Text-to-Speech Settings")
 rate = st.slider("Speaking Speed", min_value=100, max_value=250, value=150, step=10)
 voice_choice = st.selectbox("Choose Voice", ["Default", "Male", "Female"])
 
 if input_text:
     st.success("Input received!")
 
-    with st.spinner("Generating your results..."):
+    with st.spinner("Generating explanation..."):
         if mode == "Child-Friendly":
-            final_question = f"Explain '{input_text}' like I am 10 years old using real-life examples"
-            subtitle = "Explaining to a 10yr old..."
+            final_prompt = f"Explain '{input_text}' like I am 10 years old using real-life examples"
+            subheading = "Explaining to a 10yr old..."
         elif mode == "Examples Only":
-            final_question = f"Explain '{input_text}' with examples only!"
-            subtitle = "Explaining using examples..."
+            final_prompt = f"Explain '{input_text}' with examples only!"
+            subheading = "Explaining using examples..."
         elif mode == "Expert":
-            final_question = f"Explain '{input_text}' using technical and complex terminology"
-            subtitle = "Explaining to an Expert..."
+            final_prompt = f"Explain '{input_text}' using technical and complex terminology"
+            subheading = "Explaining to an Expert..."
         else:
-            final_question = input_text
-            subtitle = "Standard Explanation"
+            final_prompt = input_text
+            subheading = "Standard Explanation"
 
-        response = chain.invoke({"question": final_question})
-        st.subheader(subtitle)
+        response = chain.invoke({"question": final_prompt})
+        st.subheader(subheading)
         st.write(response)
 
-        if st.button("Play Explanation"):
-            st.toast("Speaking...")
-            speak_text_async(response, rate=rate, voice_gender=voice_choice)
+        col1, col2 = st.columns(2)
+        if col1.button("🔊 Play Explanation"):
+            generate_tts(response, rate, voice_choice)
+            threading.Thread(target=play_audio).start()
+
+        if col2.button("⏹️ Stop Explanation"):
+            stop_audio()
