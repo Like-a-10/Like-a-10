@@ -1,32 +1,4 @@
-# Core LLMs and LangChain integrations
-langchain==0.1.14
-langchain-core==0.1.44
-langchain-community==0.0.24
-langchain-openai
-langchain-anthropic
-langchain-google-genai
-langchain-huggingface
-
-# Model backends
-openai
-google-generativeai
-transformers
-huggingface-hub
-
-# Environment & Config
-python-dotenv
-
-# Math & ML
-numpy
-scikit-learn
-
-# Audio handling
-pygame
-pyttsx3
-pydub
-
-# Utility
-uuid
-
-# Web framework
 streamlit
+langchain
+openai
+python-dotenv
