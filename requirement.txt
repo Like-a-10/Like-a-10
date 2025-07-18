@@ -1,28 +1,28 @@
-# Core
-streamlit
-python-dotenv
+# LangChain and Core
+langchain==0.2.1
+langchain-core==0.1.44
+langchain_community==0.0.34
+langchain-openai==0.1.7
+langchain-anthropic==0.1.4
+langchain-google-genai==0.0.9
+langchain-huggingface==0.0.5
 
-# LangChain + Providers
-langchain
-langchain-core
-langchain_community
-langchain-openai
-openai
-langchain-anthropic
-langchain-google-genai
-google-generativeai
-langchain-huggingface
-transformers
-huggingface-hub
-langchain-core
+# AI providers
+openai==1.33.0
+google-generativeai==0.4.1
+transformers==4.41.2
+huggingface-hub==0.23.3
 
+# Utility
+python-dotenv==1.0.1
+numpy==1.26.4
+scikit-learn==1.4.2
 
-# ML Tools (if still used)
-numpy
-scikit-learn
+# Audio
+pyaudio==0.2.14
+pydub==0.25.1
+pyttsx3==2.90
 
-# Cloud-safe TTS
-gTTS
-
-# Optional helper
-tiktoken
+# Misc
+pygame==2.5.2
+uuid==1.30
