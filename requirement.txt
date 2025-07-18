@@ -1,21 +1,28 @@
+# Core
+streamlit
+python-dotenv
+
+# LangChain + Providers
 langchain
 langchain-core
 langchain_community
-
 langchain-openai
 openai
-
 langchain-anthropic
-
 langchain-google-genai
 google-generativeai
-
 langchain-huggingface
 transformers
 huggingface-hub
+langchain-core
 
 
-python-dotenv
-
-numpy 
+# ML Tools (if still used)
+numpy
 scikit-learn
+
+# Cloud-safe TTS
+gTTS
+
+# Optional helper
+tiktoken
